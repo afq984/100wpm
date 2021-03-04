@@ -1,0 +1,21 @@
+span.current {
+  text-decoration: underline;
+}
+
+span.cursor {
+  animation: blink 1060ms infinite;
+  background-repeat: repeat-y;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    background-image: linear-gradient(to right,
+        #4a4a4a, #4a4a4a 1px, #00000000 1px);
+  }
+
+  50% {
+    background-image: none;
+  }
+}
