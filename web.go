@@ -40,12 +40,8 @@ type server struct {
 var _ http.Handler = &server{}
 
 func newServer() *server {
-	t, err := fs.Sub(templates, "templates")
-	if err != nil {
-		panic(err)
-	}
 	s := &server{
-		template:    template.Must(template.ParseFS(t, "*.html")),
+		template:    template.Must(template.ParseFS(templates, "templates/*.html")),
 		textIndexer: textIndexer{textDir: filepath.Join(dataDir, "text")},
 	}
 	s.refreshTextIndex()
