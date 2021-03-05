@@ -6,36 +6,50 @@ class Typer {
     element.style.animation = null;
   }
 
-  static calculatePositions(text, wordPos, inputValue) {
-    let goodPos = wordPos;
+  static calculatePositions(text, wordBegin, inputValue) {
+    let goodPos = wordBegin;
     for (let i = 0; i < inputValue.length; i++) {
-      if (text[wordPos + i] == inputValue[i]) {
-        goodPos = wordPos + i + 1;
+      if (text[wordBegin + i] == inputValue[i]) {
+        goodPos = wordBegin + i + 1;
       } else {
         break;
       }
     }
-    let pos = wordPos + inputValue.length;
+
+    let wordEnd = wordBegin;
+    for (; wordEnd < text.length; wordEnd++) {
+      if (text[wordEnd] == " ") {
+        break;
+      }
+    }
+
+    let pos = wordBegin + inputValue.length;
     let shouldClean = false;
     if (text[goodPos - 1] == " " || goodPos == text.length) {
-      wordPos = goodPos;
+      wordBegin = goodPos;
       shouldClean = true;
     }
 
     return {
-      wordPos: wordPos,
+      wordBegin: wordBegin,
+      wordEnd: wordEnd,
       goodPos: goodPos,
       pos: pos,
       shouldClean: shouldClean,
     }
   }
 
-  setDiv(done, bad, todo) {
-    this.div.children[0].textContent = done;
-    this.div.children[1].textContent = bad;
-    this.div.children[2].textContent = todo[0];
-    Typer.resetAnimation(this.div.children[2]);
-    this.div.children[3].textContent = todo.slice(1);
+  setDiv(wordBegin, wordEnd, goodPos, pos) {
+    let setText = (name, value) => {
+      this.div.querySelector(`[name="${name}"]`).textContent = value;
+    }
+    setText("a", this.text.slice(0, wordBegin));
+    setText("b", this.text.slice(wordBegin, goodPos));
+    setText("c", this.text.slice(goodPos, Math.min(pos, wordEnd)));
+    setText("d", this.text.slice(wordEnd, pos));
+    setText("e", this.text.slice(pos, wordEnd));
+    setText("f", this.text.slice(Math.max(pos, wordEnd)));
+    Typer.resetAnimation(this.div.querySelector(".cursor"));
   }
 
   updateWpm(n) {
@@ -56,7 +70,7 @@ class Typer {
     this.t0 = null;
     this.wordPos = 0;
 
-    this.setDiv("", "", text);
+    this.setDiv(0, 0, 0, 0);
     let self = this;  // do we need self?
     input.addEventListener('input', (event) => {
       let r = Typer.calculatePositions(text, self.wordPos, self.input.value);
@@ -64,11 +78,12 @@ class Typer {
       if (r.shouldClean) {
         self.input.value = "";
       }
-      self.wordPos = r.wordPos;
+      self.wordPos = r.wordBegin;
       self.setDiv(
-        text.slice(0, r.goodPos),
-        text.slice(r.goodPos, r.pos),
-        text.slice(r.pos),
+        r.wordBegin,
+        r.wordEnd,
+        r.goodPos,
+        r.pos,
       );
       self.updateWpm(r.goodPos);
 
