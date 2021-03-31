@@ -8,6 +8,11 @@ span.cursor {
   background-repeat: repeat-y;
 }
 
+.Il  {
+  font-family: monospace;
+  font-size: 20px;
+}
+
 @keyframes blink {
 
   0%,
