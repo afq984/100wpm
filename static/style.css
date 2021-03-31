@@ -1,5 +1,6 @@
 span.underline {
-  text-decoration: underline;
+  text-decoration-line: underline;
+  text-decoration-color: #4a4a4a60;
 }
 
 span.cursor {
